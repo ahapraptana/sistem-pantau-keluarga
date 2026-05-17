@@ -292,12 +292,13 @@
         const db = getDatabase(app);
         const dataRef = ref(db, 'pantauKeluargaData'); // Nama 'folder' di database
 
+        // KODE YANG DIUBAH: Mengatur kondisi awal (reset) ke settingan netral (semua di rumah pertama, tidak bawa motor/kunci)
         const defaultData = [
-            { id: 1, name: 'Ayah', location: 'Luar Kota', motor: 'none', destination: 'Kantor', returnDate: '2026-06-16', returnTime: '19:00', departureTime: 'Sabtu, 16 Mei 2026, pukul 05.00 WIB', items: { rumah1: true, rumah2: true } },
-            { id: 2, name: 'Ibu', location: 'Keluar', motor: 'BEAT', destination: 'Sekolah', returnDate: '2026-05-16', returnTime: '14:00', departureTime: 'Sabtu, 16 Mei 2026, pukul 06.30 WIB', items: { rumah1: true, rumah2: false } },
-            { id: 3, name: 'Arkan', location: 'Rumah Kedua', motor: 'VARIO', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: true, rumah2: true } },
-            { id: 4, name: 'Atmam', location: 'Rumah Pertama', motor: 'none', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: true, rumah2: false } },
-            { id: 5, name: 'Asfa', location: 'Rumah Pertama', motor: 'none', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: true, rumah2: false } }
+            { id: 1, name: 'Ayah', location: 'Rumah Pertama', motor: 'none', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: false, rumah2: false } },
+            { id: 2, name: 'Ibu', location: 'Rumah Pertama', motor: 'none', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: false, rumah2: false } },
+            { id: 3, name: 'Arkan', location: 'Rumah Pertama', motor: 'none', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: false, rumah2: false } },
+            { id: 4, name: 'Atmam', location: 'Rumah Pertama', motor: 'none', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: false, rumah2: false } },
+            { id: 5, name: 'Asfa', location: 'Rumah Pertama', motor: 'none', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: false, rumah2: false } }
         ];
 
         let familyData = [];

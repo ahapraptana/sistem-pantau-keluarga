@@ -448,9 +448,8 @@
 
             if (isGoingOut && wasHome) {
                 familyData[personIndex].departureTime = getCurrentDayTime();
-                if (newLocation === 'Keluar') {
-                    familyData[personIndex].returnDate = getTodayDateString();
-                }
+                // KODE YANG DIUBAH: Berlaku untuk "Keluar" dan "Luar Kota"
+                familyData[personIndex].returnDate = getTodayDateString();
             } 
             
             if (!isGoingOut) {

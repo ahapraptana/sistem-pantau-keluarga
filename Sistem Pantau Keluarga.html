@@ -1,0 +1,596 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistem Pantau Keluarga</title>
+    <style>
+        :root {
+            --bg-color: #f4f7f6;
+            --text-color: #333;
+            --home1-color: #2ecc71; 
+            --home2-color: #3498db; 
+            --out-color: #e74c3c;   
+            --outcity-color: #8e44ad; 
+            --card-bg: #fff;
+        }
+
+        * {
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        body {
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        h1 {
+            text-align: center;
+            color: #2c3e50;
+            margin-bottom: 5px;
+        }
+
+        .summary {
+            background-color: #2c3e50;
+            color: white;
+            padding: 20px;
+            border-radius: 8px;
+            width: 100%;
+            max-width: 1100px; 
+            margin-bottom: 30px;
+            box-shadow: 0 10px 15px rgba(0,0,0,0.1);
+        }
+
+        .summary h2 { margin-top: 0; border-bottom: 1px solid #455a64; padding-bottom: 10px; }
+
+        .summary-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(220px, 1fr)); 
+            gap: 15px;
+            margin-top: 15px;
+        }
+
+        .summary-box {
+            background-color: rgba(255, 255, 255, 0.1);
+            padding: 15px;
+            border-radius: 8px;
+        }
+
+        .summary-box h3 {
+            margin: 0 0 10px 0;
+            font-size: 1.1em;
+            display: flex;
+            align-items: center;
+            gap: 8px;
+        }
+
+        .box-home1 h3 { color: var(--home1-color); }
+        .box-home2 h3 { color: var(--home2-color); }
+        .box-out h3 { color: #f1c40f; }
+        .box-outcity h3 { color: #d2b4de; }
+
+        .person-list {
+            list-style-type: none;
+            padding: 0;
+            margin: 0;
+            font-size: 0.9em;
+            line-height: 1.6;
+        }
+
+        .person-list li {
+            border-bottom: 1px dashed rgba(255,255,255,0.2);
+            padding-bottom: 10px;
+            margin-bottom: 10px;
+        }
+
+        .time-info { 
+            color: #bdc3c7; 
+            font-size: 0.85em; 
+            display: flex; 
+            flex-direction: column; 
+            gap: 4px; 
+            margin-top: 8px; 
+            border-top: 1px dashed rgba(255,255,255,0.1); 
+            padding-top: 8px;
+        }
+
+        .warning-text {
+            color: #ff6b6b;
+            font-weight: bold;
+            animation: pulse 1.5s infinite;
+        }
+
+        @keyframes pulse {
+            0% { opacity: 1; }
+            50% { opacity: 0.7; }
+            100% { opacity: 1; }
+        }
+
+        .grid-container {
+            display: grid;
+            grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+            gap: 20px;
+            width: 100%;
+            max-width: 1100px;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            border-radius: 10px;
+            padding: 20px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.05);
+            display: flex;
+            flex-direction: column;
+            transition: transform 0.2s;
+        }
+        
+        .card:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 12px rgba(0,0,0,0.1);
+        }
+
+        .card h3 {
+            margin: 0 0 15px 0;
+            font-size: 1.5em;
+            color: #2c3e50;
+            text-align: center;
+            border-bottom: 2px solid #eee;
+            padding-bottom: 10px;
+        }
+
+        .items-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+            background-color: #f9f9f9;
+            padding: 15px;
+            border-radius: 6px;
+        }
+
+        .checkbox-group label {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            color: #555;
+            cursor: pointer;
+            margin-bottom: 8px;
+        }
+
+        .checkbox-group input[type="checkbox"] { margin-right: 10px; cursor: pointer; }
+
+        .motor-select, .location-select {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            color: #555;
+            border-top: 1px dashed #ccc;
+            padding-top: 10px;
+        }
+
+        select, input[list], input[type="time"], input[type="date"] {
+            margin-left: 10px;
+            padding: 8px;
+            border-radius: 5px;
+            border: 1px solid #bdc3c7;
+            background-color: white;
+            width: 100%;
+            font-family: inherit;
+        }
+
+        .location-select select {
+            font-weight: bold;
+            cursor: pointer;
+        }
+
+        .input-group {
+            display: flex;
+            align-items: center;
+            font-size: 0.9em;
+            color: #555;
+            margin-bottom: 10px;
+        }
+
+        .datetime-group {
+            display: flex;
+            gap: 5px;
+            width: 100%;
+            margin-left: 10px;
+        }
+
+        .datetime-group input {
+            margin-left: 0;
+            width: 50%;
+        }
+
+        .status-badge {
+            padding: 8px 15px;
+            border-radius: 20px;
+            color: white;
+            font-weight: bold;
+            font-size: 0.9em;
+            margin-top: 10px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .bg-home1 { background-color: var(--home1-color); }
+        .bg-home2 { background-color: var(--home2-color); }
+        .bg-out { background-color: var(--out-color); }
+        .bg-outcity { background-color: var(--outcity-color); }
+
+        .reset-btn {
+            margin-top: 40px;
+            padding: 8px 15px;
+            background-color: #bdc3c7;
+            color: white;
+            border: none;
+            border-radius: 5px;
+            cursor: pointer;
+            font-size: 0.8em;
+        }
+        .reset-btn:hover { background-color: #95a5a6; }
+    </style>
+</head>
+<body>
+
+    <h1>Sistem Pantau Keluarga</h1>
+
+    <div class="summary">
+        <h2>Papan Informasi Terkini <span id="sync-status" style="font-size: 0.6em; font-weight: normal; float: right; margin-top: 8px;">🔄 Menyinkronkan...</span></h2>
+        <div class="summary-grid">
+            <div class="summary-box box-home1">
+                <h3>🏠 Rumah Pertama</h3>
+                <ul class="person-list" id="list-home1"></ul>
+            </div>
+            
+            <div class="summary-box box-home2">
+                <h3>🏡 Rumah Kedua</h3>
+                <ul class="person-list" id="list-home2"></ul>
+            </div>
+            
+            <div class="summary-box box-out">
+                <h3>🚗 Sedang Keluar</h3>
+                <ul class="person-list" id="list-out"></ul>
+            </div>
+
+            <div class="summary-box box-outcity">
+                <h3>✈️ Luar Kota</h3>
+                <ul class="person-list" id="list-outcity"></ul>
+            </div>
+        </div>
+    </div>
+
+    <div class="grid-container" id="cards-container"></div>
+    
+    <button class="reset-btn" onclick="resetData()">↻ Kembalikan ke Data Awal (Reset)</button>
+
+    <script type="module">
+        import { initializeApp } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-app.js";
+        import { getDatabase, ref, set, onValue } from "https://www.gstatic.com/firebasejs/10.11.0/firebase-database.js";
+
+        // Konfigurasi Firebase-mu
+        const firebaseConfig = {
+            apiKey: "AIzaSyDACCtgUdOHQhjcUcUpLyeHhV4ylJBmLcU",
+            authDomain: "sistem-pantau-keluarga.firebaseapp.com",
+            databaseURL: "https://sistem-pantau-keluarga-default-rtdb.asia-southeast1.firebasedatabase.app",
+            projectId: "sistem-pantau-keluarga",
+            storageBucket: "sistem-pantau-keluarga.firebasestorage.app",
+            messagingSenderId: "847217940478",
+            appId: "1:847217940478:web:65f5ac409e3c7d6f2dd2af",
+            measurementId: "G-6RG8PMRMNZ"
+        };
+
+        // Inisialisasi Firebase & Realtime Database
+        const app = initializeApp(firebaseConfig);
+        const db = getDatabase(app);
+        const dataRef = ref(db, 'pantauKeluargaData'); // Nama 'folder' di database
+
+        const defaultData = [
+            { id: 1, name: 'Ayah', location: 'Luar Kota', motor: 'none', destination: 'Kantor', returnDate: '2026-06-16', returnTime: '19:00', departureTime: 'Sabtu, 16 Mei 2026, pukul 05.00 WIB', items: { rumah1: true, rumah2: true } },
+            { id: 2, name: 'Ibu', location: 'Keluar', motor: 'BEAT', destination: 'Sekolah', returnDate: '2026-05-16', returnTime: '14:00', departureTime: 'Sabtu, 16 Mei 2026, pukul 06.30 WIB', items: { rumah1: true, rumah2: false } },
+            { id: 3, name: 'Arkan', location: 'Rumah Kedua', motor: 'VARIO', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: true, rumah2: true } },
+            { id: 4, name: 'Atmam', location: 'Rumah Pertama', motor: 'none', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: true, rumah2: false } },
+            { id: 5, name: 'Asfa', location: 'Rumah Pertama', motor: 'none', destination: '', returnDate: '', returnTime: '', departureTime: '', items: { rumah1: true, rumah2: false } }
+        ];
+
+        let familyData = [];
+
+        const container = document.getElementById('cards-container');
+        const listHome1 = document.getElementById('list-home1');
+        const listHome2 = document.getElementById('list-home2');
+        const listOut = document.getElementById('list-out');
+        const listOutCity = document.getElementById('list-outcity');
+        const syncStatus = document.getElementById('sync-status');
+
+        // FITUR BARU: Mendengarkan perubahan data secara realtime (menggantikan getItem)
+        onValue(dataRef, (snapshot) => {
+            const data = snapshot.val();
+            if (data) {
+                familyData = data;
+            } else {
+                familyData = defaultData;
+                set(dataRef, defaultData); // Upload data default kalau database masih kosong
+            }
+            renderCards();
+            updateSummary();
+            syncStatus.innerHTML = '🟢 Sinkron (Online)';
+        }, (error) => {
+            syncStatus.innerHTML = '🔴 Gagal terhubung';
+            console.error(error);
+        });
+
+        // FITUR BARU: Mengunggah data ke Firebase (menggantikan setItem localstorage)
+        function saveData() {
+            syncStatus.innerHTML = '🔄 Menyimpan...';
+            set(dataRef, familyData);
+        }
+
+        function getCurrentDayTime() {
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            const now = new Date();
+            const dayName = days[now.getDay()];
+            const date = now.getDate();
+            const month = months[now.getMonth()];
+            const year = now.getFullYear();
+            const hours = now.getHours().toString().padStart(2, '0');
+            const minutes = now.getMinutes().toString().padStart(2, '0');
+            
+            return `${dayName}, ${date} ${month} ${year}, pukul ${hours}.${minutes} WIB`;
+        }
+
+        function getTodayDateString() {
+            const now = new Date();
+            const year = now.getFullYear();
+            const month = String(now.getMonth() + 1).padStart(2, '0');
+            const day = String(now.getDate()).padStart(2, '0');
+            return `${year}-${month}-${day}`;
+        }
+
+        function formatReadableDate(dateString) {
+            if(!dateString) return '';
+            const parts = dateString.split('-'); 
+            if(parts.length !== 3) return dateString;
+            
+            const year = parseInt(parts[0]);
+            const monthIndex = parseInt(parts[1]) - 1;
+            const date = parseInt(parts[2]);
+            
+            const dateObj = new Date(year, monthIndex, date);
+            
+            const days = ['Minggu', 'Senin', 'Selasa', 'Rabu', 'Kamis', 'Jumat', 'Sabtu'];
+            const months = ['Januari', 'Februari', 'Maret', 'April', 'Mei', 'Juni', 'Juli', 'Agustus', 'September', 'Oktober', 'November', 'Desember'];
+            
+            const dayName = days[dateObj.getDay()];
+            const monthName = months[monthIndex];
+            
+            return `${dayName}, ${date} ${monthName} ${year}`;
+        }
+
+        function updateSummary() {
+            listHome1.innerHTML = '';
+            listHome2.innerHTML = '';
+            listOut.innerHTML = '';
+            listOutCity.innerHTML = '';
+
+            const now = new Date(); 
+
+            familyData.forEach(p => {
+                const motorInfo = p.motor !== 'none' ? `(🏍️ ${p.motor})` : '';
+                const dep = p.departureTime ? `<span>Berangkat: ${p.departureTime}</span>` : '';
+                
+                let retStr = '';
+                const formattedDate = formatReadableDate(p.returnDate);
+                const formattedTime = p.returnTime ? `pukul ${p.returnTime.replace(':', '.')} WIB` : ''; 
+                
+                if (formattedDate && formattedTime) {
+                    retStr = `${formattedDate}, ${formattedTime}`;
+                } else if (formattedDate) {
+                    retStr = `${formattedDate}`;
+                } else if (formattedTime) {
+                    retStr = `${formattedTime}`;
+                }
+                
+                let warningHTML = '';
+                if (p.returnDate && p.returnTime && (p.location === 'Keluar' || p.location === 'Luar Kota')) {
+                    const estDateTime = new Date(`${p.returnDate}T${p.returnTime}:00`);
+                    if (now > estDateTime) {
+                        warningHTML = `<span class="warning-text"> (⚠️ Lewat Estimasi)</span>`;
+                    }
+                }
+
+                const ret = retStr !== '' ? `<span>Estimasi Pulang: ${retStr}${warningHTML}</span>` : '';
+                const tujuan = p.destination || 'Posisi/Tujuan belum diisi';
+
+                if (p.location === 'Rumah Pertama') {
+                    listHome1.innerHTML += `<li><strong>${p.name}</strong> ${motorInfo}</li>`;
+                } else if (p.location === 'Rumah Kedua') {
+                    listHome2.innerHTML += `<li><strong>${p.name}</strong> ${motorInfo}</li>`;
+                } else if (p.location === 'Keluar') {
+                    listOut.innerHTML += `
+                        <li>
+                            <strong>${p.name}</strong> ${motorInfo}<br>
+                            📍 ${tujuan}
+                            <div class="time-info">${dep}${ret}</div>
+                        </li>`;
+                } else if (p.location === 'Luar Kota') {
+                    listOutCity.innerHTML += `
+                        <li>
+                            <strong>${p.name}</strong> ${motorInfo}<br>
+                            ✈️ ${tujuan}
+                            <div class="time-info">${dep}${ret}</div>
+                        </li>`;
+                }
+            });
+
+            if (listHome1.innerHTML === '') listHome1.innerHTML = '<li style="color:#7f8c8d;">Kosong</li>';
+            if (listHome2.innerHTML === '') listHome2.innerHTML = '<li style="color:#7f8c8d;">Kosong</li>';
+            if (listOut.innerHTML === '') listOut.innerHTML = '<li style="color:#7f8c8d;">Kosong</li>';
+            if (listOutCity.innerHTML === '') listOutCity.innerHTML = '<li style="color:#7f8c8d;">Kosong</li>';
+        }
+
+        // FUNGSI-FUNGSI DISAMBUNGKAN KE WINDOW AGAR BISA DIPANGGIL DARI HTML
+        window.changeLocation = function(personId, newLocation) {
+            const personIndex = familyData.findIndex(p => p.id === personId);
+            const oldLocation = familyData[personIndex].location;
+            familyData[personIndex].location = newLocation;
+            
+            const wasHome = oldLocation === 'Rumah Pertama' || oldLocation === 'Rumah Kedua';
+            const isGoingOut = newLocation === 'Keluar' || newLocation === 'Luar Kota';
+
+            if (isGoingOut && wasHome) {
+                familyData[personIndex].departureTime = getCurrentDayTime();
+                if (newLocation === 'Keluar') {
+                    familyData[personIndex].returnDate = getTodayDateString();
+                }
+            } 
+            
+            if (!isGoingOut) {
+                familyData[personIndex].destination = '';
+                familyData[personIndex].returnDate = '';
+                familyData[personIndex].returnTime = '';
+                familyData[personIndex].departureTime = '';
+            }
+            saveData();
+        }
+
+        window.toggleKey = function(personId, keyName) {
+            const personIndex = familyData.findIndex(p => p.id === personId);
+            familyData[personIndex].items[keyName] = !familyData[personIndex].items[keyName];
+            saveData();
+        }
+
+        window.changeMotor = function(personId, newMotor) {
+            if (newMotor !== 'none') {
+                familyData.forEach(person => {
+                    if (person.id !== personId && person.motor === newMotor) {
+                        person.motor = 'none'; 
+                    }
+                });
+            }
+            const personIndex = familyData.findIndex(p => p.id === personId);
+            familyData[personIndex].motor = newMotor;
+            saveData();
+        }
+
+        window.updateDestination = function(personId, newText) {
+            const personIndex = familyData.findIndex(p => p.id === personId);
+            familyData[personIndex].destination = newText;
+            saveData();
+        }
+
+        window.updateReturnDate = function(personId, newDate) {
+            const personIndex = familyData.findIndex(p => p.id === personId);
+            familyData[personIndex].returnDate = newDate;
+            saveData();
+        }
+
+        window.updateReturnTime = function(personId, newTime) {
+            const personIndex = familyData.findIndex(p => p.id === personId);
+            familyData[personIndex].returnTime = newTime;
+            saveData();
+        }
+
+        window.resetData = function() {
+            if(confirm('Anda yakin ingin mereset semua status ke pengaturan awal? Semua HP keluarga akan ter-reset.')) {
+                set(dataRef, defaultData);
+            }
+        }
+
+        function renderCards() {
+            container.innerHTML = '';
+            familyData.forEach(person => {
+                let badgeClass = '';
+                if (person.location === 'Rumah Pertama') badgeClass = 'bg-home1';
+                else if (person.location === 'Rumah Kedua') badgeClass = 'bg-home2';
+                else if (person.location === 'Luar Kota') badgeClass = 'bg-outcity';
+                else badgeClass = 'bg-out';
+
+                const isOut = person.location === 'Keluar' || person.location === 'Luar Kota';
+                const placeholderTujuan = isOut ? 'Pilih/tulis posisi atau tujuan...' : 'Hanya aktif saat di luar';
+
+                // Hapus onkeyup agar tidak refresh saat mengetik
+                const cardHTML = `
+                    <div class="card">
+                        <h3>${person.name}</h3>
+                        
+                        <div class="items-container">
+                            <div class="checkbox-group">
+                                <label><input type="checkbox" onchange="toggleKey(${person.id}, 'rumah1')" ${person.items.rumah1 ? 'checked' : ''}> 🔑 Kunci Rumah Pertama</label>
+                                <label><input type="checkbox" onchange="toggleKey(${person.id}, 'rumah2')" ${person.items.rumah2 ? 'checked' : ''}> 🗝️ Kunci Rumah Kedua</label>
+                            </div>
+
+                            <div class="motor-select">
+                                🏍️ Motor:
+                                <select onchange="changeMotor(${person.id}, this.value)">
+                                    <option value="none" ${person.motor === 'none' ? 'selected' : ''}>Tidak bawa</option>
+                                    <option value="NMAX" ${person.motor === 'NMAX' ? 'selected' : ''}>NMAX</option>
+                                    <option value="BEAT" ${person.motor === 'BEAT' ? 'selected' : ''}>BEAT</option>
+                                    <option value="VARIO" ${person.motor === 'VARIO' ? 'selected' : ''}>VARIO</option>
+                                </select>
+                            </div>
+                            
+                            <div class="location-select">
+                                📍 Posisi:
+                                <select onchange="changeLocation(${person.id}, this.value)">
+                                    <option value="Rumah Pertama" ${person.location === 'Rumah Pertama' ? 'selected' : ''}>Rumah Pertama</option>
+                                    <option value="Rumah Kedua" ${person.location === 'Rumah Kedua' ? 'selected' : ''}>Rumah Kedua</option>
+                                    <option value="Keluar" ${person.location === 'Keluar' ? 'selected' : ''}>Sedang Keluar</option>
+                                    <option value="Luar Kota" ${person.location === 'Luar Kota' ? 'selected' : ''}>Luar Kota</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="input-group" style="opacity: ${isOut ? '1' : '0.5'}; pointer-events: ${isOut ? 'auto' : 'none'};">
+                            📝 
+                            <input list="menu-tujuan-${person.id}" placeholder="${placeholderTujuan}" 
+                                value="${person.destination}" 
+                                onchange="updateDestination(${person.id}, this.value)"
+                                ${isOut ? '' : 'disabled'}>
+                            
+                            <datalist id="menu-tujuan-${person.id}">
+                                <option value="Kampus">
+                                <option value="Kantor">
+                                <option value="Kos">
+                                <option value="Mall">
+                                <option value="Masjid">
+                                <option value="Sekolah">
+                                <option value="Taman">
+                                <option value="Warung">
+                            </datalist>
+                        </div>
+
+                        <div class="input-group" style="opacity: ${isOut ? '1' : '0.5'}; pointer-events: ${isOut ? 'auto' : 'none'};">
+                            🗓️
+                            <div class="datetime-group">
+                                <input type="date" title="Estimasi Tanggal Pulang" 
+                                    value="${person.returnDate}" 
+                                    onchange="updateReturnDate(${person.id}, this.value)"
+                                    ${isOut ? '' : 'disabled'}>
+                                
+                                <input type="time" title="Estimasi Jam Pulang" 
+                                    value="${person.returnTime}" 
+                                    onchange="updateReturnTime(${person.id}, this.value)"
+                                    ${isOut ? '' : 'disabled'}>
+                            </div>
+                        </div>
+
+                        <div class="status-badge ${badgeClass}">Status: ${person.location === 'Keluar' ? 'Di Luar' : (person.location === 'Luar Kota' ? 'Di Luar Kota' : 'Di ' + person.location)}</div>
+                    </div>
+                `;
+                container.innerHTML += cardHTML;
+            });
+        }
+
+        setInterval(updateSummary, 60000); 
+    </script>
+</body>
+</html>
